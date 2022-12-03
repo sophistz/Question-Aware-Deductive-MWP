@@ -43,12 +43,49 @@ def get_combination_mask(batched_num_variables: torch.Tensor, combination: torch
 
     return batched_comb_mask[:, :, 0] * batched_comb_mask[:, :, 1]
 
+class FFN_op(nn.Module):
+    def __init__(self, config, commutative=True):
+        super(FFN_op, self).__init__()
+        self.commutative = commutative
+        self.hidden_size = config.hidden_size
+        self.fc_negate = nn.Linear(config.hidden_size, config.hidden_size)
+        self.fc1 = nn.Linear(config.hidden_size, config.hidden_size)
+        if not commutative:
+            self.fc2 = nn.Linear(config.hidden_size, config.hidden_size)
+        self.fc = nn.Linear(config.hidden_size, config.hidden_size)
+        self.layer_norm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
+        self.drop_out = nn.Dropout(config.hidden_dropout_prob)
+
+    def forward(self, x, negate=False, reverse=False):
+        if negate:
+            if reverse:
+                x1 = self.fc_negate(x[:, :, self.hidden_size:])
+                x2 = x[:, :, :self.hidden_size]
+            else:
+                x2 = self.fc_negate(x[:, :, self.hidden_size:])
+                x1 = x[:, :, :self.hidden_size]
+        else:
+            x1 = x[:, :, :self.hidden_size]
+            x2 = x[:, :, self.hidden_size:]
+        x1 = self.fc1(x1)
+        if self.commutative:
+            x2 = self.fc1(x2)
+        else:
+            x2 = self.fc2(x2)
+        x = x1 + x2
+        x = torch.relu(x)
+        x = self.fc(x)
+        x = torch.relu(x)
+        x = self.layer_norm(x)
+        x = self.drop_out(x)
+        return x
+
 
 class UniversalModel_Roberta(RobertaPreTrainedModel):
 
     def __init__(self, config: RobertaConfig,
-                 height: int = 4,
-                 constant_num: int = 0,
+                 height: int,
+                 constant_num: int,
                  add_replacement: bool = False,
                  consider_multiple_m0: bool = False, var_update_mode: str = 'gru'):
         """
@@ -61,6 +98,7 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
         :param consider_multiple_m0: considering more m0 in one single step. for example soemthing like "m3 = m1 x m2".
         """
         super().__init__(config)
+
         self.num_labels = config.num_labels  ## should be 6
         assert self.num_labels == 6 or self.num_labels == 8
         self.config = config
@@ -71,14 +109,25 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
 
         self.label_rep2label = nn.Linear(config.hidden_size, 1)  # 0 or 1
         self.max_height = height  ## 3 operation
-        self.linears = nn.ModuleList()
-        for i in range(self.num_labels):
-            self.linears.append(nn.Sequential(
-                nn.Linear(3 * config.hidden_size, config.hidden_size),
-                nn.ReLU(),
-                nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps),
-                nn.Dropout(config.hidden_dropout_prob)
-            ))
+        # self.linears = nn.ModuleList()
+        # for i in range(self.num_labels):
+        #     self.linears.append(nn.Sequential(
+        #         nn.Linear(3 * config.hidden_size, config.hidden_size),
+        #         nn.ReLU(),
+        #         nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps),
+        #         nn.Dropout(config.hidden_dropout_prob)
+        #     ))
+        # zyy
+        self.addition = FFN_op(config, commutative=True)
+        self.subtraction = FFN_op(config, commutative=True)
+        self.subtraction_rev = FFN_op(config, commutative=True)
+        self.multiplication = FFN_op(config, commutative=True)
+        self.division = FFN_op(config, commutative=True)
+        self.division_rev = FFN_op(config, commutative=True)
+        if self.num_labels > 6:
+            self.power = FFN_op(config, commutative=False)
+            self.power_rev = FFN_op(config, commutative=False)
+
         # zyy
         self.linears_q = nn.ModuleList()
         for i in range(self.num_labels):
@@ -102,7 +151,7 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
             nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps),
             nn.Dropout(config.hidden_dropout_prob)
         )
-        # self.m0_stopper_transformation_q_layernorm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
+        self.m0_stopper_transformation_q_layernorm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
 
         # zyy
         self.stopper_gru = nn.GRUCell(config.hidden_size, config.hidden_size)
@@ -248,7 +297,8 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
         all_logits = []
         best_mi_scores = None
         for i in range(max_height):
-            linear_modules = self.linears
+            # zyy
+            # linear_modules = self.linears
             if i == 0:
                 ## max_num_variable = 4. -> [0,1,2,3]
                 num_var_range = torch.arange(0, max_num_variable, device=variable_indexs_start.device)
@@ -268,14 +318,29 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
                 expanded_var_comb_hidden_states = var_comb_hidden_states.unsqueeze(-2).view(batch_size,
                                                                                             num_combinations, 2,
                                                                                             hidden_size)
-                m0_hidden_states = torch.cat(
-                    [expanded_var_comb_hidden_states[:, :, 0, :], expanded_var_comb_hidden_states[:, :, 1, :],
-                     expanded_var_comb_hidden_states[:, :, 0, :] * expanded_var_comb_hidden_states[:, :, 1, :]], dim=-1)
-                # batch_size, num_combinations/num_m0, hidden_size: 2,6,768
+                # m0_hidden_states = torch.cat(
+                #     [expanded_var_comb_hidden_states[:, :, 0, :], expanded_var_comb_hidden_states[:, :, 1, :],
+                #      expanded_var_comb_hidden_states[:, :, 0, :] * expanded_var_comb_hidden_states[:, :, 1, :]], dim=-1)
 
                 ## batch_size, num_combinations/num_m0, num_labels, hidden_size
-                m0_label_rep = torch.stack([layer(m0_hidden_states) for layer in linear_modules], dim=2)
+
+                # m0_label_rep = torch.stack([layer(m0_hidden_states) for layer in linear_modules], dim=2)
+                # zyy
+                m0_hidden_states = torch.cat([expanded_var_comb_hidden_states[:, :, 0, :],
+                                              expanded_var_comb_hidden_states[:, :, 1, :]], dim=-1)
+                m0_label_rep = [self.addition(m0_hidden_states, negate=False, reverse=False),
+                                self.subtraction(m0_hidden_states, negate=True, reverse=False),
+                                self.subtraction_rev(m0_hidden_states, negate=True, reverse=False),
+                                self.multiplication(m0_hidden_states, negate=False, reverse=False),
+                                self.division(m0_hidden_states, negate=True, reverse=False),
+                                self.division_rev(m0_hidden_states, negate=True, reverse=False)]
+                if self.num_labels > 6:
+                    m0_label_rep = m0_label_rep + [self.power(m0_hidden_states, negate=False, reverse=False),
+                                                   self.power_rev(m0_hidden_states, negate=False, reverse=False)]
+                m0_label_rep = torch.stack(m0_label_rep, dim=2)
+
                 ## batch_size, num_combinations/num_m0, num_labels
+
                 m0_logits = self.label_rep2label(m0_label_rep).expand(batch_size, num_combinations, self.num_labels, 2)
                 m0_logits = m0_logits + batched_combination_mask.unsqueeze(-1).unsqueeze(-1).expand(batch_size,
                                                                                                     num_combinations,
@@ -426,11 +491,25 @@ class UniversalModel_Roberta(RobertaPreTrainedModel):
                     expanded_var_comb_hidden_states = var_comb_hidden_states.unsqueeze(-2).view(batch_size,
                                                                                                 num_combinations, 2,
                                                                                                 hidden_size)
-                    mi_hidden_states = torch.cat(
-                        [expanded_var_comb_hidden_states[:, :, 0, :], expanded_var_comb_hidden_states[:, :, 1, :],
-                         expanded_var_comb_hidden_states[:, :, 0, :] * expanded_var_comb_hidden_states[:, :, 1, :]],
-                        dim=-1)
-                    mi_label_rep = torch.stack([layer(mi_hidden_states) for layer in linear_modules], dim=2)
+                    # zyy
+                    # mi_hidden_states = torch.cat(
+                    #     [expanded_var_comb_hidden_states[:, :, 0, :], expanded_var_comb_hidden_states[:, :, 1, :],
+                    #      expanded_var_comb_hidden_states[:, :, 0, :] * expanded_var_comb_hidden_states[:, :, 1, :]],
+                    #     dim=-1)
+                    # mi_label_rep = torch.stack([layer(mi_hidden_states) for layer in linear_modules], dim=2)
+                    mi_hidden_states = torch.cat([expanded_var_comb_hidden_states[:, :, 0, :],
+                                                  expanded_var_comb_hidden_states[:, :, 1, :]], dim=-1)
+                    mi_label_rep = [self.addition(mi_hidden_states, negate=False, reverse=False),
+                                    self.subtraction(mi_hidden_states, negate=True, reverse=False),
+                                    self.subtraction_rev(mi_hidden_states, negate=True, reverse=False),
+                                    self.multiplication(mi_hidden_states, negate=False, reverse=False),
+                                    self.division(mi_hidden_states, negate=True, reverse=False),
+                                    self.division_rev(mi_hidden_states, negate=True, reverse=False)]
+                    if self.num_labels > 6:
+                        mi_label_rep = mi_label_rep + [self.power(mi_hidden_states, negate=False, reverse=False),
+                                                       self.power_rev(mi_hidden_states, negate=False, reverse=False)]
+                    mi_label_rep = torch.stack(mi_label_rep, dim=2)
+
                     mi_logits = self.label_rep2label(mi_label_rep).expand(batch_size, num_combinations, self.num_labels,
                                                                           2)
                     mi_logits = mi_logits + batched_combination_mask.unsqueeze(-1).unsqueeze(-1).expand(batch_size,

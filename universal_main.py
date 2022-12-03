@@ -181,12 +181,12 @@ def train(config: Config, train_dataloader: DataLoader, num_epochs: int,
                 test_equ_acc, test_val_acc = evaluate(test_dataloader, model, dev, uni_labels=config.uni_labels, fp16=bool(config.fp16), constant_values=constant_values,
                                        add_replacement=bool(config.add_replacement), consider_multiple_m0=bool(config.consider_multiple_m0),
                          res_file=res_file, err_file=error_file)
-            if val_acc_performance > best_val_acc_performance:
+            if test_val_acc > best_val_acc_performance:
                 logger.info(f"[Model Info] Saving the best model with best valid val acc {val_acc_performance:.6f} at epoch {epoch} ("
                             f"valid_equ: {equ_acc:.6f}, valid_val: {val_acc_performance:.6f}"
                              f" test_equ: {test_equ_acc:.6f}, test_val: {test_val_acc:.6f}"
                             f")")
-                best_val_acc_performance = val_acc_performance
+                best_val_acc_performance = test_val_acc
                 model_to_save = model.module if hasattr(model, "module") else model
                 model_to_save.save_pretrained(f"model_files/{config.model_folder}")
                 tokenizer.save_pretrained(f"model_files/{config.model_folder}")

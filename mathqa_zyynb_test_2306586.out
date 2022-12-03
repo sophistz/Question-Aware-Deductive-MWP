@@ -1,0 +1,120 @@
+09/25/2022 13:23:44 - INFO - __main__ -   device = cuda:0
+09/25/2022 13:23:44 - INFO - __main__ -   batch_size = 30
+09/25/2022 13:23:44 - INFO - __main__ -   train_num = -1
+09/25/2022 13:23:44 - INFO - __main__ -   dev_num = -1
+09/25/2022 13:23:44 - INFO - __main__ -   test_num = -1
+09/25/2022 13:23:44 - INFO - __main__ -   train_file = data/MathQA/mathqa_train_nodup_our_filtered.json
+09/25/2022 13:23:44 - INFO - __main__ -   dev_file = data/MathQA/mathqa_dev_nodup_our_filtered.json
+09/25/2022 13:23:44 - INFO - __main__ -   test_file = data/MathQA/mathqa_test_nodup_our_filtered.json
+09/25/2022 13:23:44 - INFO - __main__ -   train_filtered_steps = None
+09/25/2022 13:23:44 - INFO - __main__ -   test_filtered_steps = None
+09/25/2022 13:23:44 - INFO - __main__ -   use_constant = 1
+09/25/2022 13:23:44 - INFO - __main__ -   add_replacement = 1
+09/25/2022 13:23:44 - INFO - __main__ -   seed = 42
+09/25/2022 13:23:44 - INFO - __main__ -   model_folder = mathqa_question_best
+09/25/2022 13:23:44 - INFO - __main__ -   bert_folder = 
+09/25/2022 13:23:44 - INFO - __main__ -   bert_model_name = roberta-base
+09/25/2022 13:23:44 - INFO - __main__ -   height = 10
+09/25/2022 13:23:44 - INFO - __main__ -   train_max_height = 15
+09/25/2022 13:23:44 - INFO - __main__ -   consider_multiple_m0 = 1
+09/25/2022 13:23:44 - INFO - __main__ -   var_update_mode = gru
+09/25/2022 13:23:44 - INFO - __main__ -   mode = test
+09/25/2022 13:23:44 - INFO - __main__ -   learning_rate = 2e-05
+09/25/2022 13:23:44 - INFO - __main__ -   max_grad_norm = 1.0
+09/25/2022 13:23:44 - INFO - __main__ -   num_epochs = 1000
+09/25/2022 13:23:44 - INFO - __main__ -   fp16 = 1
+09/25/2022 13:23:44 - INFO - __main__ -   parallel = 1
+09/25/2022 13:23:44 - INFO - __main__ -   cut_off = -100
+09/25/2022 13:23:44 - INFO - __main__ -   print_error = 0
+09/25/2022 13:23:44 - INFO - __main__ -   error_file = results/error.json
+09/25/2022 13:23:44 - INFO - __main__ -   result_file = results/res.json
+09/25/2022 13:23:44 - INFO - __main__ -   [Data Info] constant info: {'100.0': 0, '1.0': 1, '2.0': 2, '3.0': 3, '4.0': 4, '10.0': 5, '1000.0': 6, '60.0': 7, '0.5': 8, '3600.0': 9, '12.0': 10, '0.2778': 11, '3.1416': 12, '3.6': 13, '0.25': 14, '5.0': 15, '6.0': 16, '360.0': 17, '52.0': 18, '180.0': 19}
+09/25/2022 13:23:44 - INFO - __main__ -   Testing the model now.
+09/25/2022 13:24:00 - INFO - __main__ -   [Data Info] Reading test data
+Tokenization:   0%|          | 0/1605 [00:00<?, ?it/s]Tokenization:  13%|█▎        | 212/1605 [00:00<00:00, 2115.59it/s]Tokenization:  36%|███▌      | 580/1605 [00:00<00:00, 3033.60it/s]Tokenization:  59%|█████▉    | 951/1605 [00:00<00:00, 3339.47it/s]Tokenization:  83%|████████▎ | 1334/1605 [00:00<00:00, 3530.67it/s]Tokenization: 100%|██████████| 1605/1605 [00:00<00:00, 3416.29it/s]
+09/25/2022 13:24:00 - INFO - src.data.universal_dataset -   , total number instances: 1572 (before filter: 1605), max num steps: 10
+09/25/2022 13:24:00 - INFO - src.data.universal_dataset -   filtered type counter: Counter({'larger than the max height 10': 33})
+09/25/2022 13:24:00 - INFO - src.data.universal_dataset -   number of instances removed: 33
+09/25/2022 13:24:00 - WARNING - src.data.universal_dataset -   [WARNING] find duplication num: 2 (not removed)
+09/25/2022 13:24:00 - INFO - src.data.universal_dataset -   Counter({3: 391, 4: 289, 2: 237, 5: 198, 6: 156, 1: 110, 7: 87, 8: 57, 9: 36, 10: 11})
+--validation:   0%|          | 0/53 [00:00<?, ?it/s]--validation:   2%|▏         | 1/53 [00:01<01:35,  1.84s/it]--validation:   4%|▍         | 2/53 [00:02<00:47,  1.07it/s]--validation:   6%|▌         | 3/53 [00:02<00:32,  1.54it/s]--validation:   8%|▊         | 4/53 [00:02<00:25,  1.92it/s]--validation:   9%|▉         | 5/53 [00:03<00:21,  2.25it/s]--validation:  11%|█▏        | 6/53 [00:03<00:18,  2.53it/s]--validation:  13%|█▎        | 7/53 [00:03<00:16,  2.72it/s]--validation:  15%|█▌        | 8/53 [00:04<00:15,  2.83it/s]--validation:  17%|█▋        | 9/53 [00:04<00:15,  2.92it/s]--validation:  19%|█▉        | 10/53 [00:04<00:15,  2.82it/s]--validation:  21%|██        | 11/53 [00:05<00:14,  2.89it/s]--validation:  23%|██▎       | 12/53 [00:05<00:14,  2.74it/s]--validation:  25%|██▍       | 13/53 [00:05<00:14,  2.85it/s]--validation:  26%|██▋       | 14/53 [00:06<00:14,  2.78it/s]--validation:  28%|██▊       | 15/53 [00:06<00:13,  2.90it/s]--validation:  30%|███       | 16/53 [00:06<00:12,  2.85it/s]--validation:  32%|███▏      | 17/53 [00:07<00:11,  3.03it/s]--validation:  34%|███▍      | 18/53 [00:07<00:11,  3.09it/s]--validation:  36%|███▌      | 19/53 [00:07<00:11,  3.08it/s]--validation:  38%|███▊      | 20/53 [00:08<00:10,  3.23it/s]--validation:  40%|███▉      | 21/53 [00:08<00:11,  2.83it/s]--validation:  42%|████▏     | 22/53 [00:08<00:10,  2.89it/s]--validation:  43%|████▎     | 23/53 [00:09<00:10,  2.92it/s]--validation:  45%|████▌     | 24/53 [00:09<00:10,  2.78it/s]--validation:  47%|████▋     | 25/53 [00:09<00:09,  2.81it/s]--validation:  49%|████▉     | 26/53 [00:10<00:09,  2.82it/s]--validation:  51%|█████     | 27/53 [00:10<00:08,  2.97it/s]--validation:  53%|█████▎    | 28/53 [00:10<00:08,  3.04it/s]--validation:  55%|█████▍    | 29/53 [00:11<00:08,  2.88it/s]--validation:  57%|█████▋    | 30/53 [00:11<00:08,  2.87it/s]--validation:  58%|█████▊    | 31/53 [00:11<00:07,  2.88it/s]--validation:  60%|██████    | 32/53 [00:12<00:07,  2.93it/s]--validation:  62%|██████▏   | 33/53 [00:12<00:06,  2.95it/s]--validation:  64%|██████▍   | 34/53 [00:12<00:06,  3.01it/s]--validation:  66%|██████▌   | 35/53 [00:13<00:05,  3.14it/s]--validation:  68%|██████▊   | 36/53 [00:13<00:05,  3.10it/s]--validation:  70%|██████▉   | 37/53 [00:13<00:05,  3.09it/s]--validation:  72%|███████▏  | 38/53 [00:14<00:04,  3.12it/s]--validation:  74%|███████▎  | 39/53 [00:14<00:05,  2.64it/s]--validation:  75%|███████▌  | 40/53 [00:15<00:04,  2.64it/s]--validation:  77%|███████▋  | 41/53 [00:15<00:04,  2.83it/s]--validation:  79%|███████▉  | 42/53 [00:15<00:03,  2.85it/s]--validation:  81%|████████  | 43/53 [00:16<00:03,  2.86it/s]--validation:  83%|████████▎ | 44/53 [00:16<00:03,  2.96it/s]--validation:  85%|████████▍ | 45/53 [00:16<00:02,  3.08it/s]--validation:  87%|████████▋ | 46/53 [00:17<00:02,  2.70it/s]--validation:  89%|████████▊ | 47/53 [00:17<00:02,  2.88it/s]--validation:  91%|█████████ | 48/53 [00:17<00:01,  2.98it/s]--validation:  92%|█████████▏| 49/53 [00:18<00:01,  3.07it/s]--validation:  94%|█████████▍| 50/53 [00:18<00:00,  3.11it/s]--validation:  96%|█████████▌| 51/53 [00:18<00:00,  3.14it/s]--validation:  98%|█████████▊| 52/53 [00:18<00:00,  3.17it/s]--validation: 100%|██████████| 53/53 [00:19<00:00,  3.78it/s]--validation: 100%|██████████| 53/53 [00:19<00:00,  2.77it/s]
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] Equation accuracy: 76.64%, total: 1572, corr: 1230, adjusted_total: 1605
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] Value accuracy: 81.06%, total: 1572, corr: 1301, adjusted_total: 1605
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 5 Acc.:73.23 (145/198) val acc: 78.28 (155/198)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 3 Acc.:80.56 (315/391) val acc: 85.68 (335/391)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 6 Acc.:75.64 (118/156) val acc: 83.97 (131/156)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 2 Acc.:82.70 (196/237) val acc: 84.81 (201/237)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 4 Acc.:81.66 (236/289) val acc: 84.78 (245/289)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 7 Acc.:74.71 (65/87) val acc: 79.31 (69/87)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 8 Acc.:77.19 (44/57) val acc: 82.46 (47/57)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 9 Acc.:58.33 (21/36) val acc: 66.67 (24/36)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 1 Acc.:77.27 (85/110) val acc: 79.09 (87/110)
+09/25/2022 13:24:20 - INFO - __main__ -   [Info] step num: 10 Acc.:45.45 (5/11) val acc: 63.64 (7/11)
+
+======== GPU REPORT ========
+
+==============NVSMI LOG==============
+
+Timestamp                                 : Sun Sep 25 13:24:21 2022
+Driver Version                            : 510.73.08
+CUDA Version                              : 11.6
+
+Attached GPUs                             : 4
+GPU 00000000:28:00.0
+    Accounting Mode                       : Enabled
+    Accounting Mode Buffer Size           : 4000
+    Accounted Processes
+        Process ID                        : 52007
+            GPU Utilization               : 51 %
+            Memory Utilization            : 43 %
+            Max memory usage              : 15793 MiB
+            Time                          : 33144 ms
+            Is Running                    : 0
+
+GPU 00000000:44:00.0
+    Accounting Mode                       : Enabled
+    Accounting Mode Buffer Size           : 4000
+    Accounted Processes                   : None
+
+GPU 00000000:A3:00.0
+    Accounting Mode                       : Enabled
+    Accounting Mode Buffer Size           : 4000
+    Accounted Processes                   : None
+
+GPU 00000000:A4:00.0
+    Accounting Mode                       : Enabled
+    Accounting Mode Buffer Size           : 4000
+    Accounted Processes                   : None
+
+Sun Sep 25 13:24:21 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 510.73.08    Driver Version: 510.73.08    CUDA Version: 11.6     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Quadro RTX 8000     On   | 00000000:28:00.0 Off |                  Off |
+| 34%   45C    P0   101W / 260W |      1MiB / 49152MiB |     87%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+|   1  Quadro RTX 8000     On   | 00000000:44:00.0 Off |                  Off |
+| 33%   25C    P8    12W / 260W |      1MiB / 49152MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+|   2  Quadro RTX 8000     On   | 00000000:A3:00.0 Off |                  Off |
+| 33%   22C    P8    29W / 260W |      1MiB / 49152MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+|   3  Quadro RTX 8000     On   | 00000000:A4:00.0 Off |                  Off |
+| 33%   24C    P8    25W / 260W |      1MiB / 49152MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+

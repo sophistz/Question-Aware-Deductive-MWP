@@ -1,7 +1,7 @@
 CUDA_VISIBLE_DEVICES=0,1,2,3 \
   python3 universal_main.py \
     --device=cuda:0 \
-    --model_folder=mathqa_question \
+    --model_folder=mathqa_rev \
     --mode=train \
     --height=10 \
     --train_max_height=15 \
