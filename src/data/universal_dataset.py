@@ -128,15 +128,15 @@ class UniversalDataset(Dataset):
                     var_starts.append(k)
                     var_ends.append(k + quant_num - 1)
                 # zyy
-                if token == 'Ġ.' and k != len(tokens) - 1:
+                if token == 'ï¼Ž' and k != len(tokens) - 1:
                     question_start = k
             # zyy
             if question_start != 0:
                 question_start += 1
             # zyy
-            # print(question_start)
-            # print(tokens[question_start:])
-            # exit()
+            print(question_start)
+            print(tokens[question_start:])
+            exit()
 
             assert len(input_ids) < 512  ## make sure no error in tokenization
             num_variable = len(var_starts)

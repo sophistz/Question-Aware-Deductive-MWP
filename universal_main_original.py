@@ -10,7 +10,7 @@ import torch.nn as nn
 import numpy as np
 import os
 import random
-from src.model.universal_model import UniversalModel
+from src.model.universal_model_original import UniversalModel
 from src.model.universal_model_roberta_original import UniversalModel_Roberta
 from src.model.universal_model_bert import UniversalModel_Bert
 from src.model.universal_model_xlmroberta import UniversalModel_XLMRoberta
@@ -467,7 +467,7 @@ def main():
             logger.info(f"[Data Info] Testing instances: {len(test_dataset)}")
         # Prepare data loader
         logger.info("[Data Info] Loading data")
-        train_dataloader = DataLoader(dataset, batch_size=conf.batch_size, shuffle=True, num_workers=conf.num_workers, collate_fn=dataset.collate_function)
+        train_dataloader = DataLoader(dataset, batch_size=conf.batch_size, shuffle=False, num_workers=conf.num_workers, collate_fn=dataset.collate_function)
         valid_dataloader = DataLoader(eval_dataset, batch_size=conf.batch_size, shuffle=False, num_workers=conf.num_workers, collate_fn=eval_dataset.collate_function)
         test_loader = None
         if test_dataset is not None:
