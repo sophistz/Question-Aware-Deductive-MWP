@@ -24,4 +24,4 @@ To run the SVAMP dataset:
 bash ./scripts/run_svamp.bash
 ```
 ## Acknowledgement
-Our code is source from the baseline [DeductReasoner](https://github.com/allanj/Deductive-MWP)
+Some part of this codebase is bought from the baseline [DeductReasoner](https://github.com/allanj/Deductive-MWP)
